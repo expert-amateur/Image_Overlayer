@@ -1,4 +1,5 @@
 package com.example.imageoverlayer
+
 import android.net.Uri
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -6,11 +7,14 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.material3.Button
+import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
@@ -48,6 +52,12 @@ fun MyApp() {
 
     var imageUri1 by remember { mutableStateOf<Uri?>(null) }
     var imageUri2 by remember { mutableStateOf<Uri?>(null) }
+    var showSliders1 by remember { mutableStateOf(false) }
+    var showSliders2 by remember { mutableStateOf(false) }
+    var aspectRatioX1 by remember { mutableStateOf(16f) }
+    var aspectRatioY1 by remember { mutableStateOf(9f) }
+    var aspectRatioX2 by remember { mutableStateOf(16f) }
+    var aspectRatioY2 by remember { mutableStateOf(9f) }
 
     val launcher1 = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         imageUri1 = uri
@@ -94,8 +104,13 @@ fun MyApp() {
                             scaleX = imageState1.value.scaleX
                             scaleY = imageState1.value.scaleY
                             rotationZ = imageState1.value.rotation // Apply the rotation
-                        },
-                    contentScale = ContentScale.None
+                        }
+                        .clickable {
+                            showSliders1 = true
+                            showSliders2 = false
+                        }
+                        .aspectRatio(aspectRatioX1 / aspectRatioY1),
+                    contentScale = ContentScale.Crop
                 )
             }
 
@@ -120,9 +135,58 @@ fun MyApp() {
                             scaleX = imageState2.value.scaleX
                             scaleY = imageState2.value.scaleY
                             rotationZ = imageState2.value.rotation // Apply the rotation
-                        },
-                    contentScale = ContentScale.None
+                        }
+                        .clickable {
+                            showSliders1 = false
+                            showSliders2 = true
+                        }
+                        .aspectRatio(aspectRatioX2 / aspectRatioY2),
+                    contentScale = ContentScale.Crop
                 )
+            }
+
+            if (showSliders1) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp)
+                        .align(Alignment.BottomCenter)
+                ) {
+                    Text("Aspect Ratio X: ${aspectRatioX1.roundToInt()}")
+                    Slider(
+                        value = aspectRatioX1,
+                        onValueChange = { aspectRatioX1 = it },
+                        valueRange = 1f..100f
+                    )
+                    Text("Aspect Ratio Y: ${aspectRatioY1.roundToInt()}")
+                    Slider(
+                        value = aspectRatioY1,
+                        onValueChange = { aspectRatioY1 = it },
+                        valueRange = 1f..100f
+                    )
+                }
+            }
+
+            if (showSliders2) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp)
+                        .align(Alignment.BottomCenter)
+                ) {
+                    Text("Aspect Ratio X: ${aspectRatioX2.roundToInt()}")
+                    Slider(
+                        value = aspectRatioX2,
+                        onValueChange = { aspectRatioX2 = it },
+                        valueRange = 1f..100f
+                    )
+                    Text("Aspect Ratio Y: ${aspectRatioY2.roundToInt()}")
+                    Slider(
+                        value = aspectRatioY2,
+                        onValueChange = { aspectRatioY2 = it },
+                        valueRange = 1f..100f
+                    )
+                }
             }
         }
     }
@@ -135,10 +199,3 @@ fun DefaultPreview() {
         MyApp()
     }
 }
-
-
-
-
-
-
-
